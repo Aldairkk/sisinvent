@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductoResource\Pages;
-use App\Filament\Resources\ProductoResource\RelationManagers;
-use App\Models\Producto;
+use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,22 +17,23 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ProductoResource extends Resource
+class UserResource extends Resource
 {
-    protected static ?string $model = Producto::class;
+    protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wrench';
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 //
-                TextInput::make('codigo')->label('Código'),
-                TextInput::make('descripcion')->label('Descripción'),
-                TextInput::make('tipo_producto')->label('Tipo de Producto'),
-                TextInput::make('tipo_medida')->label('Tipo de Medida'),
-                
+                TextInput::make('name')->label('Nombre')->required(),
+                TextInput::make('email')->label('Correo')->email(),
+                TextInput::make('password')
+                ->label('Contraseña')
+                ->password(),
+                Select::make('roles')->multiple()->relationship('roles','name'),
             ]);
     }
 
@@ -39,10 +42,9 @@ class ProductoResource extends Resource
         return $table
             ->columns([
                 //
-                TextColumn::make('codigo'),
-                TextColumn::make('descripcion'),
-                TextColumn::make('tipo_producto'),
-                TextColumn::make('tipo_medida'),
+                TextColumn::make('name'),
+                TextColumn::make('email'),
+                TextColumn::make('roles.name')
             ])
             ->filters([
                 //
@@ -67,9 +69,9 @@ class ProductoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductos::route('/'),
-            'create' => Pages\CreateProducto::route('/create'),
-            'edit' => Pages\EditProducto::route('/{record}/edit'),
+            'index' => Pages\ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }

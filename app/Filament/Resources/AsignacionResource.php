@@ -18,12 +18,13 @@ use Filament\Tables\Columns\TextColumn;
 use Icetalker\FilamentStepper\Forms\Components\Stepper;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class AsignacionResource extends Resource
 {
     protected static ?string $model = Asignacion::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
 
     public static function form(Form $form): Form
     {
@@ -50,9 +51,11 @@ class AsignacionResource extends Resource
         return $table
             ->columns([
                 //
+                TextColumn::make('cliente.cedula')->label('Cedula'),
                 TextColumn::make('cliente.nombre')->label('Cliente'),
-                TextColumn::make('ingreso.producto.descripcion')->label('Producto'),
+                TextColumn::make('ingreso.producto.descripcion')->label('Producto entregado'),
                 TextColumn::make('cantidad_asignada')->label('Cantidad'),
+                TextColumn::make('created_at')->label('Asignado'),
             ])
             ->filters([
                 //
@@ -62,6 +65,7 @@ class AsignacionResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

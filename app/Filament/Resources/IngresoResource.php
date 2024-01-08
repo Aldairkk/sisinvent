@@ -20,12 +20,13 @@ use Filament\Resources\Forms\Components;
 use Filament\Tables\Columns\TextColumn;
 use Icetalker\FilamentStepper\Forms\Components\Stepper;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class IngresoResource extends Resource
 {
     protected static ?string $model = Ingreso::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
     public static function form(Form $form): Form
     {
@@ -46,6 +47,7 @@ class IngresoResource extends Resource
         return $table
             ->columns([
                 //
+                TextColumn::make('producto.codigo')->label('Codigo'),
                 TextColumn::make('producto.descripcion')->label('Producto'),
                 TextColumn::make('cantidad')->getStateUsing(function(Model $record) {
                     // return whatever you need to show
@@ -53,6 +55,7 @@ class IngresoResource extends Resource
                     return $record->cantidad - $record->asignaciones->sum('cantidad_asignada');
                 }),
                 TextColumn::make('observacion'),
+                TextColumn::make('created_at')->label('Ingresados'),
                 
             ])
             ->filters([
@@ -62,6 +65,7 @@ class IngresoResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make(),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
