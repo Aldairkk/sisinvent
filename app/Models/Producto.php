@@ -18,8 +18,16 @@ class Producto extends Model
     use HasFactory;
 
     public function ingresos()
-{
-    return $this->hasMany(Ingreso::class);
-}
+    {
+        return $this->hasMany(Ingreso::class);
+    }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(Asignacion::class, 'ingreso_id');
+    }
+
+
+
 }
 

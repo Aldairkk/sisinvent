@@ -50,9 +50,13 @@ class IngresoResource extends Resource
                 TextColumn::make('producto.codigo')->label('Codigo'),
                 TextColumn::make('producto.descripcion')->label('Producto'),
                 TextColumn::make('cantidad')->getStateUsing(function(Model $record) {
+                    $record->load('asignaciones');
+                    $cantidadDisponible = $record->cantidad - $record->asignaciones->sum('cantidad_asignada');
+                    
                     // return whatever you need to show
                     //dd($record->asignaciones->sum('cantidad_asignada'));
                     return $record->cantidad - $record->asignaciones->sum('cantidad_asignada');
+                    
                 }),
                 TextColumn::make('observacion'),
                 TextColumn::make('created_at')->label('Ingresados'),

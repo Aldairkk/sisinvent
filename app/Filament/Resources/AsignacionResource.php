@@ -19,12 +19,19 @@ use Icetalker\FilamentStepper\Forms\Components\Stepper;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use App\Models\Ingreso;
+use App\Models\Producto;
+use Closure;
+use Filament\Forms\Get;
 
 class AsignacionResource extends Resource
 {
     protected static ?string $model = Asignacion::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
+
+
+
 
     public static function form(Form $form): Form
     {
@@ -33,16 +40,31 @@ class AsignacionResource extends Resource
                 //
                 Select::make('cliente_id')
                 ->label('Cliente')
+                ->required()
                 ->relationship('cliente', 'nombre'),
                 Select::make('ingreso_id')
                 ->label('Producto')
+                ->required()
                 ->relationship(
                     name: 'ingreso.producto',
                     titleAttribute: 'descripcion'),
                     //modifyQueryUsing: fn (Builder $query) => dd($query->where('id'))),
-                TextInput::make('cantidad_asignada')->label('Cantidad')->integer(),
-
-
+                TextInput::make('cantidad_asignada')
+                ->label('Cantidad')
+                ->integer()
+                ->required()
+                ->rules([
+                    fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
+                        $producto = Producto::find($get('ingreso_id'));
+                        $cantidad_producto = $producto->ingresos->sum('cantidad');
+                        $asignada = $producto->asignaciones->sum('cantidad_asignada');
+                        $total  = $cantidad_producto - ($asignada + $value);
+                        $diferencia =  $cantidad_producto - $asignada;
+                        if ($total < 0) {
+                            $fail("No puede ingresar una cantidad mayor a {$diferencia}");
+                        }
+                    },
+                ])
             ]);
     }
 
@@ -62,6 +84,7 @@ class AsignacionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

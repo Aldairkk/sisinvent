@@ -18,11 +18,17 @@ class Ingreso extends Model
 {
     return $this->hasMany(Asignacion::class);
 }
+
+    public function getCantidadAsignadaAttribute()
+    {
+        return $this->asignaciones->sum('cantidad_asignada');
+    }
+
     use HasFactory;
 
     public function producto()
-{
-    return $this->belongsTo(Producto::class);
-}
+    {
+        return $this->belongsTo(Producto::class);
+    }
 }
 
